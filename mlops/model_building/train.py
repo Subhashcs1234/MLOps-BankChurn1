@@ -19,13 +19,11 @@ import mlflow
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("mlops-training-experiment")
 
-api = HfApi()
 
-
-Xtrain_path = "hf://datasets/<-----Hugging Face User ID ----->/bank-customer-churn/Xtrain.csv"
-Xtest_path = "hf://datasets/<-----Hugging Face User ID ----->/bank-customer-churn/Xtest.csv"
-ytrain_path = "hf://datasets/<-----Hugging Face User ID ----->/bank-customer-churn/ytrain.csv"
-ytest_path = "hf://datasets/<-----Hugging Face User ID ----->/bank-customer-churn/ytest.csv"
+Xtrain_path = "hf://datasets/subhash33/bank-customer-churn/Xtrain.csv"
+Xtest_path = "hf://datasets/subhash33/bank-customer-churn/Xtest.csv"
+ytrain_path = "hf://datasets/subhash33/bank-customer-churn/ytrain.csv"
+ytest_path = "hf://datasets/subhash33/bank-customer-churn/ytest.csv"
 
 Xtrain = pd.read_csv(Xtrain_path)
 Xtest = pd.read_csv(Xtest_path)
@@ -126,7 +124,7 @@ with mlflow.start_run():
     })
 
     # Save the model locally
-    model_path = "best_churn_model_v1.joblib"
+    model_path = "best_churn_model.joblib"
     joblib.dump(best_model, model_path)
 
     # Log the model artifact
@@ -134,7 +132,7 @@ with mlflow.start_run():
     print(f"Model saved as artifact at: {model_path}")
 
     # Upload to Hugging Face
-    repo_id = "<-----Hugging Face User ID ----->/churn-model"
+    repo_id = "subhash33/Bank-Churn-Model"
     repo_type = "model"
 
     # Step 1: Check if the space exists
@@ -148,8 +146,8 @@ with mlflow.start_run():
 
     # create_repo("churn-model", repo_type="model", private=False)
     api.upload_file(
-        path_or_fileobj="best_churn_model_v1.joblib",
-        path_in_repo="best_churn_model_v1.joblib",
+        path_or_fileobj="best_churn_model.joblib",
+        path_in_repo="best_churn_model.joblib",
         repo_id=repo_id,
         repo_type=repo_type,
     )
