@@ -75,24 +75,13 @@ param_grid = {
 # Model pipeline
 model_pipeline = make_pipeline(preprocessor, xgb_model)
 
-# Start MLflow run
 with mlflow.start_run():
     # Hyperparameter tuning
     grid_search = GridSearchCV(model_pipeline, param_grid, cv=5, n_jobs=-1)
     grid_search.fit(Xtrain, ytrain)
 
-    # Log all parameter combinations and their mean test scores
-    results = grid_search.cv_results_
-    for i in range(len(results['params'])):
-        param_set = results['params'][i]
-        mean_score = results['mean_test_score'][i]
-        std_score = results['std_test_score'][i]
-
-        # Log each combination as a separate MLflow run
-        with mlflow.start_run(nested=True):
-            mlflow.log_params(param_set)
-            mlflow.log_metric("mean_test_score", mean_score)
-            mlflow.log_metric("std_test_score", std_score)
+    # Log the cv_results_ dictionary as an artifact
+    mlflow.log_dict(grid_search.cv_results_, "cv_results.json")
 
     # Log best parameters separately in main run
     mlflow.log_params(grid_search.best_params_)
@@ -111,7 +100,6 @@ with mlflow.start_run():
     train_report = classification_report(ytrain, y_pred_train, output_dict=True)
     test_report = classification_report(ytest, y_pred_test, output_dict=True)
 
-    # Log the metrics for the best model
     mlflow.log_metrics({
         "train_accuracy": train_report['accuracy'],
         "train_precision": train_report['1']['precision'],
